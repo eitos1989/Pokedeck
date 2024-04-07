@@ -1,6 +1,8 @@
 let rendercnt = 20;
 let curRenderCnt = 1;
 
+let typDE = ['Wasser', 'Feuer', 'Pflanze', 'Stahl', 'Geist', 'Elektro', 'Unlicht', 'Drache', 'Boden', 'Kampf', 'Psycho', 'Käfer', 'Fels', 'Eis', 'Flug', 'Gift', 'Normal', 'Fee'];
+let typEN = ['bug', 'dragon', 'fairy', ]
 async function init() {
     await includeHTML();
 }
