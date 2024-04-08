@@ -1,12 +1,38 @@
+@import url(font.css);
+@import url(footer.css);
+@import url(header.css);
+
+:root {
+    --greenColor: #008000;
+    --fontColorDark: #242e30;
+    --fontColorLight: white;
+    --backgroundColorFooter: #1f1f1f;
+    --headerFontSize: 2rem;
+    --sectionFontSize: 1.5rem;
+    --defaultFontSize: 1.25rem;
+    --secondaryFontSize: 1rem;
+    --captionFontSize: 0.75rem;
+    --fontWeightBold: 600;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    font-size: var(--defaultFontSize);
+    margin: 0px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: var(--fontWeightBold);
+}
 
 .background-color-bug {
     background-color: #729f3f;
-    color: #fff;
+    color: var(--fontColorLight);
 }
 
 .background-color-dark {
     background-color: #707070;
-    color: #fff;
+    color: var(--fontColorLight);
 }
 
 .background-color-dragon {
@@ -16,27 +42,27 @@
     background: -o-linear-gradient(180deg, #53a4cf 50%, #f16e57 50%);
     background: linear-gradient(180deg, #53a4cf 50%, #f16e57 50%);
     background-color: #53a4cf;
-    color: #fff;
+    color: var(--fontColorLight);
 }
 
 .background-color-electric {
     background-color: #eed535;
-    color: #212121;
+    color: var(--fontColorDark);
 }
 
 .background-color-fairy {
     background-color: #fdb9e9;
-    color: #212121;
+    color: var(--fontColorDark);
 }
 
 .background-color-fighting {
     background-color: #d56723;
-    color: #fff;
+    color: var(--fontColorLight);
 }
 
 .background-color-fire {
     background-color: #fd7d24;
-    color: #fff;
+    color: var(--fontColorLight);
 }
 
 .background-color-flying {
@@ -46,17 +72,17 @@
     background: -o-linear-gradient(180deg, #3dc7ef 50%, #bdb9b8 50%);
     background: linear-gradient(180deg, #3dc7ef 50%, #bdb9b8 50%);
     background-color: #3dc7ef;
-    color: #212121;
+    color: var(--fontColorDark);
 }
 
 .background-color-ghost {
     background-color: #7b62a3;
-    color: #fff;
+    color: var(--fontColorLight);
 }
 
 .background-color-grass {
     background-color: #9bcc50;
-    color: #212121;
+    color: var(--fontColorDark);
 }
 
 .background-color-ground {
@@ -66,40 +92,40 @@
     background: -o-linear-gradient(180deg, #f7de3f 50%, #ab9842 50%);
     background: linear-gradient(180deg, #f7de3f 50%, #ab9842 50%);
     background-color: #f7de3f;
-    color: #212121;
+    color: var(--fontColorDark);
 }
 
 .background-color-ice {
     background-color: #51c4e7;
-    color: #212121;
+    color: var(--fontColorDark);
 }
 
 .background-color-normal {
     background-color: #a4acaf;
-    color: #212121;
+    color: var(--fontColorDark);
 }
 
 .background-color-poison {
     background-color: #b97fc9;
-    color: #fff;
+    color: var(--fontColorLight);
 }
 
 .background-color-psychic {
     background-color: #f366b9;
-    color: #fff;
+    color: var(--fontColorLight);
 }
 
 .background-color-rock {
     background-color: #a38c21;
-    color: #fff;
+    color: var(--fontColorLight);
 }
 
 .background-color-steel {
     background-color: #9eb7b8;
-    color: #212121;
+    color: var(--fontColorDark);
 }
 
 .background-color-water {
     background-color: #4592c4;
-    color: #fff;
+    color: var(--fontColorLight);
 }
