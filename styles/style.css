@@ -169,3 +169,14 @@ h1, h2, h3, h4, h5, h6 {
     margin: 32px 0px ;
 }
 
+.modal-footer {
+    border-top: 0px solid;
+}
+
+.pokestats a{
+    color: var(--bs-gray-300);
+}
+
+.pokestats a:hover, a:visited, a:active {
+    color: var(--bs-nav-underline-link-active-color);
+}
