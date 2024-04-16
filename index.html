@@ -44,28 +44,38 @@
         </div>
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
-              <div class="modal-content" id="pokeModalContent">
-                <div class="modal-header d-flex justify-content-between">
-                  <h1 class="modal-title fs-5" id="pokeModalName">Modal title</h1>
-                  <h2 class="modal-title fs-5" id="pokeModalId">Modal title</h2>
+              <div class="modal-content rounded-5" id="pokeModalContent">
+                <div class="modal-header flex-column">
+                  <div class="w-100 d-flex justify-content-between">
+                    <h1 class="modal-title fs-5" id="pokeModalName">Modal title</h1>
+                    <h1 class="modal-title fs-5" id="pokeModalId">Modal title</h1>
+                  </div>
+                  <div class="d-flex justify-content-evenly w-100">
+                    <div>
+                        <span class="badge text-bg-light">grass</span>
+                    </div>
+                    <div>
+                        <span class="badge text-bg-light">poison</span>
+                    </div>
+                  </div>                
                 </div>
-                <div class="modal-body">
-                  <img class="pokeImg" id="pokeModalImage" src="" class="card-img-top" alt="...">
-                  <ul class="nav nav-underline nav-fill">
-                    <li class="nav-item pokestats">
-                      <a class="nav-link active" aria-current="page" href="#">About</a>
+                <div class="modal-body z-index-hover">
+                  <img class="pokeImg" id="pokeModalImage" src="" class="card-img-top" alt="..." />
+                </div>
+                <div class="modal-body bg-white rounded-5 mt-minus-rem color-black">
+                  <ul class="nav nav-underline nav-fill mtb-32">
+                    <li class="nav-item">
+                      <a class="nav-link active pokestats" aria-current="page" href="#" onclick="openTab(event, 'aboutTab')">About</a>
                     </li>
-                    <li class="nav-item pokestats">
-                      <a class="nav-link" href="#">Base Stats</a>
+                    <li class="nav-item">
+                      <a class="nav-link pokestats" href="#" onclick="openTab(event, 'baseStatsTab')">Base Stats</a>
                     </li>
-                    <li class="nav-item pokestats">
-                      <a class="nav-link" href="#">Moves</a>
+                    <li class="nav-item">
+                      <a class="nav-link pokestats" href="#" onclick="openTab(event, 'movesTab')">Moves</a>
                     </li>
                   </ul>
                   <!-- Tab content -->
                   <div id="aboutTab" class="tabcontent">
-                    <h3>About</h3>
-                    <p>Information</p>
                     <p id="pokeDescription"></p>
                     <table class="table table-sm">
                       <tbody>
@@ -105,26 +115,26 @@
                       </tbody>
                     </table>
                   </div>
-  
-                  <div id="baseStatsTab" class="tabcontent">
-                    <h3>Base Stats</h3>
-                    <div>
+                  <div id="baseStatsTab" class="tabcontent d-none">
+                    <div id="pokeStats">
                       <canvas id="statsChart"></canvas>
                     </div>
                   </div>
-
-                  <div id="movesTab" class="tabcontent">
-                    <h3>Moves</h3>
+                  <div id="movesTab" class="tabcontent d-none">
                     <div id="movesGrid" class="d-flex align-content-start flex-wrap">
-
-                    </div>
                   </div>
-                  <div class="modal-footer">
-                </div>
-
+                  </div>
                 </div>
               </div>
             </div>
+            <button class="carousel-control-prev" id="btnPrevPokemon" type="button" >
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" id="btnNextPokemon" type="button">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
           </div>
 
     <div w3-include-html="templates/footer.html"></div>

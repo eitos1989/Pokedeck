@@ -25,6 +25,19 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: var(--fontWeightBold);
 }
 
+.color-black {
+    color: black !important;
+
+}
+
+.mt-minus-rem {
+    margin-top: -3rem;
+}
+
+.z-index-hover{
+    z-index: 1;
+}
+
 .background-color-bug {
     background-color: #729f3f;
     color: var(--fontColorLight);

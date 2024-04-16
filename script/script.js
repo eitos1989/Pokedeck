@@ -1,10 +1,46 @@
+// START VARIABLEN DEKLANATION 
 let rendercnt = 20;
 let curRenderCnt = 1;
+let curModalPokemonId = 0;
 
+const TYPEBACKGROUNDS = [
+    "background-color-bug",
+    "background-color-dark",
+    "background-color-dragon",
+    "background-color-electric",
+    "background-color-fairy",
+    "background-color-fighting",
+    "background-color-fire",
+    "background-color-flying",
+    "background-color-ghost",
+    "background-color-grass",
+    "background-color-ground",
+    "background-color-ice",
+    "background-color-normal",
+    "background-color-poison",
+    "background-color-psychic",
+    "background-color-rock",
+    "background-color-steel",
+    "background-color-water"
+];
+// END VARIABLEN DEKLANATION 
+
+// START HELPER FUNCTION 
 async function init() {
     await includeHTML();
     renderPokeOverview();
 }
+
+function openTab(event, tabName) {
+    let tabContentArr = document.getElementsByClassName("tabcontent");
+    let navLinks = document.getElementsByClassName("pokestats");
+    for (let i = 0; i < tabContentArr.length; i++) {
+        tabContentArr[i].classList.add("d-none");
+        navLinks[i].classList.remove('active')
+    }
+    document.getElementById(tabName).classList.remove("d-none");
+    event.currentTarget.classList.add("active");
+}   
 
 async function includeHTML() {
     let includeElements = document.querySelectorAll('[w3-include-html]');
@@ -20,6 +56,26 @@ async function includeHTML() {
     }
 }
 
+function removeBackgroundcolor(id){
+    for (let i = 0; i < TYPEBACKGROUNDS.length; i++) {
+        const cssBackgroundType = TYPEBACKGROUNDS[i];
+        document.getElementById(id).classList.remove(cssBackgroundType);
+    }
+}
+
+function renderOnclickButtonsforModal() {
+    if(curModalPokemonId == 1) {
+        document.getElementById("btnPrevPokemon").classList.add("d-none");
+    }else{
+        document.getElementById("btnPrevPokemon").classList.remove("d-none");
+    }
+    document.getElementById("btnPrevPokemon").setAttribute("onclick", `renderPokemonModal(${curModalPokemonId-1})`);
+    document.getElementById("btnNextPokemon").setAttribute("onclick", `renderPokemonModal(${curModalPokemonId+1})`);
+    
+}
+// END HELPER FUNCTION
+
+// START API FUNCTIONS
 async function loadPokemon(id) {
     let url = "https://pokeapi.co/api/v2/pokemon/" + id;
     let response = await fetch(url);
@@ -40,6 +96,8 @@ async function loadPokemonSpecis(id){
     }
 }
 
+// END HELPER FUNCTION
+
 // START Load data von PokemonAPI
 
 function getAbilitiesStr(pokeJson){
@@ -52,6 +110,7 @@ function getAbilitiesStr(pokeJson){
 
     return pokeAbilityArr.join(', ');
 }
+
 function getPokemonName(pokeJson) {
     return pokeJson['name'];
 }
@@ -98,8 +157,8 @@ function getStatsJSON(pokeJson) {
             pokeStatsJSONStr += ", "
         }
     }
-    pokeStatsJSONStr += "}"
-    console.log(pokeStatsJSONStr)
+    pokeStatsJSONStr += "}";
+    //console.log(pokeStatsJSONStr)
     return JSON.parse(pokeStatsJSONStr);
 }
 
@@ -140,11 +199,10 @@ function getSpecisHabitat(specisJson) {
     return specisJson['habitat']['name'];
 }
 
-// START Load data von SpecisAPI
-
 // END Load data von SpecisAPI
 
 // START Render Function
+
 function renderPokeTypes(pokeTypeArr){
     let pokeArrStr = '<div class="pokeTypes mr-16px">';
     for (let i = 0; i < pokeTypeArr.length; i++) {
@@ -162,7 +220,7 @@ async function renderPokeContainer(pokeID){
     let pokeJson= await loadPokemon(pokeID);
     const pokeTypes = getPoketypes(pokeJson); 
     return `
-    <div class="card ${getBackgroundClass(pokeTypes[0])} pokeContainer" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick=loadPokemonModal(${pokeID})>
+    <div class="card ${getBackgroundClass(pokeTypes[0])} pokeContainer" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick=renderPokemonModal(${pokeID})>
         <div class="card-body">
         <div class="card-title d-flex justify-content-between">
             <h5 class="card-title">${getPokemonName(pokeJson)}</h5>
@@ -205,8 +263,18 @@ async function renderModalAboutTab(id, pokeJson) {
     document.getElementById('pokeAbilities').innerHTML = getAbilitiesStr(pokeJson);
 }
 
+async function refeshCanvas(){
+    let oldcanv = document.getElementById('statsChart');
+    document.getElementById('pokeStats').removeChild(oldcanv)
+
+    let canv = document.createElement('canvas');
+    canv.id = 'statsChart';
+    document.getElementById('pokeStats').appendChild(canv);
+}
+
 async function renderStatsTab(pokeStatsJSON) {
     const statsNames = Object.keys(pokeStatsJSON);
+    await refeshCanvas();
     const ctx = document.getElementById('statsChart');
     let statsValues = [];
     
@@ -235,7 +303,6 @@ async function renderStatsTab(pokeStatsJSON) {
 
 }
 
-
 async function loadPokemonOverview() {
     let pokeOverviewContent = "";
     let end = curRenderCnt + rendercnt
@@ -243,7 +310,6 @@ async function loadPokemonOverview() {
         pokeOverviewContent += await renderPokeContainer(i); 
         curRenderCnt++;  
     }
-
     return pokeOverviewContent;
 }
 
@@ -251,16 +317,19 @@ async function renderPokeOverview() {
     document.getElementById('pokeStartContainer').innerHTML += await loadPokemonOverview();
 }
 
-async function loadPokemonModal(id) {
+async function renderPokemonModal(id) {
     let curPokemon = await loadPokemon(id);
+    curModalPokemonId = id;
     const pokeTypes = getPoketypes(curPokemon); 
     document.getElementById('pokeModalName').innerHTML = getPokemonName(curPokemon);
     document.getElementById('pokeModalId').innerHTML = "#" + getPokeId(curPokemon);
     document.getElementById('pokeModalImage').src = getPokeImage(curPokemon);
-    document.getElementById('movesGrid').innerHTML = renderPokeMoves(getMovesArr(curPokemon))
+    document.getElementById('movesGrid').innerHTML = renderPokeMoves(getMovesArr(curPokemon));
+    removeBackgroundcolor('pokeModalContent');
     document.getElementById('pokeModalContent').classList.add(getBackgroundClass(pokeTypes[0]))
     renderModalAboutTab(id, curPokemon);
     renderStatsTab(getStatsJSON(curPokemon));
+    renderOnclickButtonsforModal();
 }
 
 // ENDE Render Function
