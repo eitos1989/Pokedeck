@@ -1,7 +1,10 @@
 // START VARIABLEN DEKLANATION 
 let rendercnt = 20;
+let maxSearchResults = 12;
 let curRenderCnt = 1;
 let curModalPokemonId = 0;
+let isSearchAktiv = false;
+let searchIDs = [];
 
 const TYPEBACKGROUNDS = [
     "background-color-bug",
@@ -28,7 +31,8 @@ const TYPEBACKGROUNDS = [
 // START HELPER FUNCTION 
 async function init() {
     await includeHTML();
-    renderPokeOverview();
+    await createSearchPokeArr();
+    await renderPokeOverview();
 }
 
 function openTab(event, tabName) {
@@ -40,7 +44,50 @@ function openTab(event, tabName) {
     }
     document.getElementById(tabName).classList.remove("d-none");
     event.currentTarget.classList.add("active");
-}   
+}
+
+async function search(){
+    let substr = document.getElementById('pokeSearch').value;
+    substr = substr.toLowerCase();
+    if(substr.length >= 3) {
+        isSearchAktiv = true;
+        let pokeSearchableJSON = JSON.parse(localStorage.getItem("pokeSearchableJSON"));
+        let pokeNamesArr = Object.keys(pokeSearchableJSON);
+        const searchArr = pokeNamesArr.filter(str => str.includes(substr));
+        if(searchArr.length > 0) {
+            for (let i = 0; i < searchArr.length; i++) {
+                const element = searchArr[i];
+                searchIDs[i] =  pokeSearchableJSON[element];
+            }
+            if(searchIDs.length > maxSearchResults) {
+                searchIDs = searchIDs.subarray(0, maxSearchResults);
+            }
+        }        
+    }else {
+        isSearchAktiv = false;
+    }
+}
+
+async function createSearchPokeArr() {
+    let pokeJSON = "";
+    let allPokeNameJson = "{";
+    if(localStorage.getItem("PokeJSON") == null){
+        await saveAllPokemonNamesENtoLocalStorage();
+    }
+    pokeJSON = JSON.parse(localStorage.getItem("PokeJSON"));
+    pokeResultsArr = pokeJSON['results'];
+    for (let i = 0; i < pokeResultsArr.length; i++) {
+        const element = pokeResultsArr[i];
+        allPokeNameJson += `"${element['name']}" : "${element['url'].split("/")[6]}"`;
+        if(i != (pokeResultsArr.length-1)) {
+            allPokeNameJson += ", "
+        }
+    }
+
+    allPokeNameJson += "}";
+    localStorage.setItem("pokeSearchableJSON", allPokeNameJson);
+
+}
 
 async function includeHTML() {
     let includeElements = document.querySelectorAll('[w3-include-html]');
@@ -70,8 +117,13 @@ function renderOnclickButtonsforModal() {
         document.getElementById("btnPrevPokemon").classList.remove("d-none");
     }
     document.getElementById("btnPrevPokemon").setAttribute("onclick", `renderPokemonModal(${curModalPokemonId-1})`);
-    document.getElementById("btnNextPokemon").setAttribute("onclick", `renderPokemonModal(${curModalPokemonId+1})`);
-    
+    document.getElementById("btnNextPokemon").setAttribute("onclick", `renderPokemonModal(${curModalPokemonId+1})`); 
+}
+
+function renderCarosuelFunctionForModalBySearch(){
+    if(searchIDs.length > 0) {
+
+    }
 }
 // END HELPER FUNCTION
 
@@ -96,6 +148,25 @@ async function loadPokemonSpecis(id){
     }
 }
 
+async function saveAllPokemonNamesENtoLocalStorage(){
+    let url = "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=1302";
+    let response = await fetch(url);
+    if(response.ok){
+        pokeNameJSON = await response.json();
+        localStorage.setItem("PokeJSON", JSON.stringify(pokeNameJSON));
+    }else{
+        console.log("error");
+    }
+}
+
+async function refeshCanvas(){
+    let oldcanv = document.getElementById('statsChart');
+    document.getElementById('pokeStats').removeChild(oldcanv)
+
+    let canv = document.createElement('canvas');
+    canv.id = 'statsChart';
+    document.getElementById('pokeStats').appendChild(canv);
+}
 // END HELPER FUNCTION
 
 // START Load data von PokemonAPI
@@ -263,15 +334,6 @@ async function renderModalAboutTab(id, pokeJson) {
     document.getElementById('pokeAbilities').innerHTML = getAbilitiesStr(pokeJson);
 }
 
-async function refeshCanvas(){
-    let oldcanv = document.getElementById('statsChart');
-    document.getElementById('pokeStats').removeChild(oldcanv)
-
-    let canv = document.createElement('canvas');
-    canv.id = 'statsChart';
-    document.getElementById('pokeStats').appendChild(canv);
-}
-
 async function renderStatsTab(pokeStatsJSON) {
     const statsNames = Object.keys(pokeStatsJSON);
     await refeshCanvas();
@@ -306,9 +368,16 @@ async function renderStatsTab(pokeStatsJSON) {
 async function loadPokemonOverview() {
     let pokeOverviewContent = "";
     let end = curRenderCnt + rendercnt
-    for (let i = curRenderCnt; i < end; i++) {
-        pokeOverviewContent += await renderPokeContainer(i); 
-        curRenderCnt++;  
+    if(!isSearchAktiv){
+        for (let i = curRenderCnt; i < end; i++) {
+            pokeOverviewContent += await renderPokeContainer(i); 
+            curRenderCnt++;  
+        }
+    }else {
+        for (let i = curRenderCnt; i < end; i++) {
+            pokeOverviewContent += await renderPokeContainer(i); 
+            curRenderCnt++;  
+        }
     }
     return pokeOverviewContent;
 }
