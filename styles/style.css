@@ -170,6 +170,11 @@ h1, h2, h3, h4, h5, h6 {
     scale: 1.05;
 }
 
+.noImage {
+    height: 200px;
+    width: 100%;
+}
+
 .flex-wrap {
     gap: 20px
 }

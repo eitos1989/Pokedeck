@@ -3,9 +3,12 @@ let rendercnt = 20;
 let maxSearchResults = 12;
 let curRenderCnt = 1;
 let curModalPokemonId = 0;
+
 let isSearchAktiv = false;
+let curSearchArrId = 0;
 let searchIDs = [];
 
+const FALLBACKIMG = `./img/card-image.svg`;
 const TYPEBACKGROUNDS = [
     "background-color-bug",
     "background-color-dark",
@@ -46,25 +49,43 @@ function openTab(event, tabName) {
     event.currentTarget.classList.add("active");
 }
 
-async function search(){
+function search(){
     let substr = document.getElementById('pokeSearch').value;
     substr = substr.toLowerCase();
+    document.getElementById('pokeStartContainer').innerHTML = ""; //bereinigt den Container
     if(substr.length >= 3) {
-        isSearchAktiv = true;
-        let pokeSearchableJSON = JSON.parse(localStorage.getItem("pokeSearchableJSON"));
-        let pokeNamesArr = Object.keys(pokeSearchableJSON);
-        const searchArr = pokeNamesArr.filter(str => str.includes(substr));
-        if(searchArr.length > 0) {
-            for (let i = 0; i < searchArr.length; i++) {
-                const element = searchArr[i];
-                searchIDs[i] =  pokeSearchableJSON[element];
-            }
-            if(searchIDs.length > maxSearchResults) {
-                searchIDs = searchIDs.subarray(0, maxSearchResults);
-            }
-        }        
+        doTheSearch(substr);
     }else {
         isSearchAktiv = false;
+        curRenderCnt = 1;
+        document.getElementById('loadMorePokemonBtn').classList.remove("d-none");
+        document.getElementById('noSearchResults').classList.add("d-none");
+        renderPokeOverview();
+    }
+}
+
+async function doTheSearch(substr) {
+    isSearchAktiv = true;
+    let pokeSearchableJSON = JSON.parse(localStorage.getItem("pokeSearchableJSON"));
+    let pokeNamesArr = Object.keys(pokeSearchableJSON);
+    const searchArr = pokeNamesArr.filter(str => str.includes(substr));
+    if(searchArr.length > 0) {
+        for (let i = 0; i < searchArr.length; i++) {
+            const element = searchArr[i];
+            searchIDs[i] = pokeSearchableJSON[element];
+        }
+        subSearchArraytoMaxSearchResults();
+        await renderPokeOverview();
+    }else{
+        renderNoSearchResults();
+    }
+    document.getElementById('loadMorePokemonBtn').classList.add("d-none");
+    document.getElementById('noSearchResults').classList.add("d-none"); 
+}
+
+function subSearchArraytoMaxSearchResults() {
+    if(searchIDs.length > maxSearchResults) {
+        searchIDs = searchIDs.slice(0,maxSearchResults);
     }
 }
 
@@ -111,18 +132,21 @@ function removeBackgroundcolor(id){
 }
 
 function renderOnclickButtonsforModal() {
-    if(curModalPokemonId == 1) {
+    if(isSearchAktiv){
+        curSearchArrId = searchIDs.indexOf(`${curModalPokemonId}`);
+    }
+    if(curModalPokemonId == 1 || (isSearchAktiv && (curSearchArrId == 0 || curSearchArrId == -1))) {
         document.getElementById("btnPrevPokemon").classList.add("d-none");
     }else{
         document.getElementById("btnPrevPokemon").classList.remove("d-none");
     }
-    document.getElementById("btnPrevPokemon").setAttribute("onclick", `renderPokemonModal(${curModalPokemonId-1})`);
-    document.getElementById("btnNextPokemon").setAttribute("onclick", `renderPokemonModal(${curModalPokemonId+1})`); 
-}
-
-function renderCarosuelFunctionForModalBySearch(){
-    if(searchIDs.length > 0) {
-
+    if(!isSearchAktiv){
+        document.getElementById("btnPrevPokemon").setAttribute("onclick", `renderPokemonModal(${curModalPokemonId-1})`);
+        document.getElementById("btnNextPokemon").setAttribute("onclick", `renderPokemonModal(${curModalPokemonId+1})`); 
+    }else {
+        
+        document.getElementById("btnPrevPokemon").setAttribute("onclick", `renderPokemonModal(${searchIDs[curSearchArrId-1]})`);
+        document.getElementById("btnNextPokemon").setAttribute("onclick", `renderPokemonModal(${searchIDs[curSearchArrId+1]})`); 
     }
 }
 // END HELPER FUNCTION
@@ -201,8 +225,19 @@ function getPokeId(pokeJson){
     return pokeJson['id'];
 }
 
-function getPokeImage(pokeJson) {
-    return pokeJson['sprites']['other']['dream_world']['front_default'];
+function getPokeImage(pokeJson) { 
+    let img = pokeJson['sprites']['other']['dream_world']['front_default'];
+
+    if(img == null){
+        img = FALLBACKIMG;
+        return `<img src="${img}" class="noImage" alt="...">`
+    }else {
+        return `<img src="${img}" class="pokeImg" alt="...">`
+    }
+    
+    
+    
+ 
 }
 
 function getBackgroundClass(typeZero){
@@ -300,7 +335,7 @@ async function renderPokeContainer(pokeID){
         <div class="pokeOverview">
             ${renderPokeTypes(pokeTypes)}
             <div>
-            <img class="pokeImg" src="${getPokeImage(pokeJson)}" class="card-img-top" alt="...">
+            ${getPokeImage(pokeJson)}
             </div>
         </div>
         </div>
@@ -367,19 +402,25 @@ async function renderStatsTab(pokeStatsJSON) {
 
 async function loadPokemonOverview() {
     let pokeOverviewContent = "";
-    let end = curRenderCnt + rendercnt
+    let end = curRenderCnt + rendercnt;
     if(!isSearchAktiv){
         for (let i = curRenderCnt; i < end; i++) {
             pokeOverviewContent += await renderPokeContainer(i); 
             curRenderCnt++;  
         }
     }else {
-        for (let i = curRenderCnt; i < end; i++) {
-            pokeOverviewContent += await renderPokeContainer(i); 
+        for (let i = 0; i < searchIDs.length; i++) {
+            pokeOverviewContent += await renderPokeContainer(searchIDs[i]); 
             curRenderCnt++;  
         }
     }
     return pokeOverviewContent;
+}
+
+function renderNoSearchResults() {
+    document.getElementById('pokeSearchStrNoResult').innerHTML = document.getElementById('pokeSearch').value;
+    document.getElementById('noSearchResults').classList.remove('d-none');
+
 }
 
 async function renderPokeOverview() {
@@ -387,12 +428,12 @@ async function renderPokeOverview() {
 }
 
 async function renderPokemonModal(id) {
-    let curPokemon = await loadPokemon(id);
     curModalPokemonId = id;
+    const curPokemon = await loadPokemon(id);
     const pokeTypes = getPoketypes(curPokemon); 
     document.getElementById('pokeModalName').innerHTML = getPokemonName(curPokemon);
     document.getElementById('pokeModalId').innerHTML = "#" + getPokeId(curPokemon);
-    document.getElementById('pokeModalImage').src = getPokeImage(curPokemon);
+    document.getElementById('pokeModalImage').innerHTML = getPokeImage(curPokemon);
     document.getElementById('movesGrid').innerHTML = renderPokeMoves(getMovesArr(curPokemon));
     removeBackgroundcolor('pokeModalContent');
     document.getElementById('pokeModalContent').classList.add(getBackgroundClass(pokeTypes[0]))

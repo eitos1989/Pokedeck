@@ -37,10 +37,21 @@
 <body onload="init()">
     <div w3-include-html="templates/header.html"></div>
     <div class="container">
-        
+      <div class="card mtb-32 d-none" id="noSearchResults">
+        <div class="card-body">
+          <h5 class="card-title">Keine Suchergebnis</h5>
+          <p class="card-text">
+            Leider konnten wir keine Ergenisse finden zu ihrer Suchanfrage <b><span id="pokeSearchStrNoResult"> La Li Lu</span></b>
+          </p>
+          <p class="card-text">
+            <b>ACHTUNG:</b> Sie können nur nach englischen Namen der Pokemon suchen.
+          </p>
+        </div>
+      </div>
+
         <div class="d-flex align-content-start flex-wrap mtb-32" id="pokeStartContainer"></div>
         <div class="text-center mtb-32">
-            <button type="button" class="btn btn-primary" onclick="renderPokeOverview()">weitere Pokemon laden</button>
+            <button type="button" class="btn btn-primary" onclick="renderPokeOverview()" id="loadMorePokemonBtn">weitere Pokemon laden</button>
         </div>
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -59,8 +70,8 @@
                     </div>
                   </div>                
                 </div>
-                <div class="modal-body z-index-hover">
-                  <img class="pokeImg" id="pokeModalImage" src="" class="card-img-top" alt="..." />
+                <div class="modal-body z-index-hover" id="pokeModalImage">
+                  <!-- <img class="pokeImg" id="pokeModalImage" src="" class="card-img-top" alt="..." /> -->
                 </div>
                 <div class="modal-body bg-white rounded-5 mt-minus-rem color-black">
                   <ul class="nav nav-underline nav-fill mtb-32">
